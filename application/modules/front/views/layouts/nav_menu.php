@@ -1,4 +1,4 @@
-<?php $pageType = $this->params['_pageType']; ?>
+<?php $pageType = $this->params['_pageType'] ?? null; ?>
 
 <div class="menu">
   <ul>
@@ -34,9 +34,9 @@
 			else echo '<li><a href="/contact">Contact</a></li>'."\n";
         ?>
 
-		<?php if (strcmp($pageType, "home")) { 
+		<?php if ($pageType !== "home") {
 			$searchQuery = NULL;
-			if (strcmp($pageType, "search") == 0) $searchQuery = $this->params['_searchQuery'];
+			if ($pageType === "search") $searchQuery = $this->params['_searchQuery'] ?? null;
 		?>
 		<div style="float: right; padding-right: 10px; padding-top:2px;"><a href="/searchtips" style="font-weight: normal; font-size: 10px; color: #000000;">Search Tips</a></div>
 		<div style="float: right; display: inline; padding-right: 7px; padding-top: 2px; vertical-align: center; height: 95%;">

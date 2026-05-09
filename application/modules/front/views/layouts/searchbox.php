@@ -1,16 +1,6 @@
 <?php
-// Optional logic for $stextval
-if (strcmp($this->params['_pageType'], "home")) {
-    $searchQuery = null;
-    if (strcmp($this->params['_pageType'], "search") == 0) {
-        $searchQuery = $this->params['_searchQuery'];
-    }
-    if (isset($searchQuery)) {
-        $stextval = $searchQuery;
-    } else {
-        $stextval = "";
-    }
-}
+$pageType = $this->params['_pageType'] ?? null;
+$searchQuery = $pageType === "search" ? ($this->params['_searchQuery'] ?? '') : '';
 
 // Get collections directly from a new Util instance
 use app\modules\front\models\Util;
@@ -22,7 +12,7 @@ $collections = $util->getCollectionsInfo('none', true);
     <div class="search-container">
         <div id="searchbar">
             <form name="searchform" action="/search/" method="get" id="searchform">
-                <input type="text" class="searchquery" name="q" placeholder="Search …" />
+                <input type="text" class="searchquery" name="q" placeholder="Search …" value="<?php echo htmlspecialchars($searchQuery); ?>" />
                 <input type="submit" class="searchsubmit search-btn" value="l" />
             </form>
         </div>

@@ -1,4 +1,7 @@
-<?php $this->beginPage() ?>
+<?php
+$this->beginPage();
+$pageType = $this->params['_pageType'] ?? null;
+?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" translate="no">
 <head>
@@ -30,10 +33,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="<?php echo $this->context->auto_version('/css/all.css'); ?>" media="screen" rel="stylesheet" type="text/css" />
   <link href="<?php echo $this->context->auto_version('/css/donate.css'); ?>" media="screen" rel="stylesheet" type="text/css" />
-  <?php if (strcmp($this->params['_pageType'], "search") == 0) { ?>
+  <?php if ($pageType === "search") { ?>
   <link href="<?php echo $this->context->auto_version('/css/pager.css'); ?>" media="screen" rel="stylesheet" type="text/css" />
   <?php } ?>
-  <?php if (strcmp($this->params['_pageType'], "narrator") == 0) { ?>
+  <?php if ($pageType === "narrator") { ?>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;1,6..72,400&display=swap" rel="stylesheet">
@@ -72,7 +75,7 @@
         ?>	</script>
   <?php } ?>
 	<script>
-	<?php if (strcmp($this->params['_pageType'], "search") == 0) echo "var searchQuery = '".htmlentities(stripslashes($this->params['_searchQuery']))."';";  ?>
+		<?php if ($pageType === "search") echo "var searchQuery = ".json_encode(stripslashes($this->params['_searchQuery'] ?? '')).";";  ?>
 	</script>
   <script src="<?php echo $this->context->auto_version('/js/sunnah.js'); ?>"></script>
   <!--<script src="https://apis.google.com/js/platform.js" async defer></script>-->
@@ -106,13 +109,13 @@
 
 		<a href="https://sunnah.com"><div id="banner" class=bannerTop></div></a>
 		<!-- <a href="#"><div id=back-to-top></div></a> -->
-		<?php if (strcmp($this->params['_pageType'], "home") != 0) echo $this->render('/layouts/searchbox'); ?>
+			<?php if ($pageType !== "home") echo $this->render('/layouts/searchbox'); ?>
 		<div class=clear></div>
 		<?php
-			  if (strcmp($this->params['_pageType'], "home")) {
-					echo "<div class=crumbs>".$this->context->pathCrumbs("Home", "/")."</div>";
-					echo "<div class=clear></div>";
-				}
+			if ($pageType !== "home") {
+				echo "<div class=crumbs>".$this->context->pathCrumbs("Home", "/")."</div>";
+				echo "<div class=clear></div>";
+			}
 		?>
 	</div>
 
@@ -141,7 +144,7 @@
 	</div> <!-- nonheader close -->
     <?php echo $this->render('//layouts/footer') ?>
     <?php
-		if ($this->params['_pageType'] === "book" || $this->params['_pageType'] === "hadith")
+		if ($pageType === "book" || $pageType === "hadith")
 			echo $this->render('//layouts/clipboard_options')
 	?>
 	<div class="clear"></div>
