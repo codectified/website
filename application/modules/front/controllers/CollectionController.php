@@ -54,7 +54,7 @@ class CollectionController extends SController
         if ($this->_collection) {
         	$this->_entries = $this->util->getBook($collectionName);
         }
-        if (is_null($this->_collection) || count($this->_entries) === 0) {
+        if (is_null($this->_collection) || empty($this->_entries)) {
             $errorMsg = "There is no such collection on our website. Click <a href=\"/\">here</a> to go to the home page.";
         	throw new NotFoundHttpException($errorMsg);
         }
@@ -378,11 +378,13 @@ class CollectionController extends SController
 	    'showChapterNumbers' => $showChapterNumbers,
         ];
 
-        $this->view->params['_pageType'] = "book";
-        $this->view->params['pageTitle'] = $this->_viewVars->pageTitle;
+	        $this->view->params['_pageType'] = "book";
+	        if (isset($this->_viewVars->pageTitle)) {
+	            $this->view->params['pageTitle'] = $this->_viewVars->pageTitle;
+	        }
 
-        return $this->render('tce', $viewVars);
-	}
+	        return $this->render('tce', $viewVars);
+		}
 	
 	public function actionHadithByNumber($collectionName, $hadithNumber) {
 		$num = ltrim($hadithNumber, "0");
