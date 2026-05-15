@@ -2,7 +2,6 @@
 
 namespace app\components\search;
 
-use app\modules\front\models\Book;
 use app\modules\front\models\Util;
 use app\modules\front\models\ArabicHadith;
 use app\modules\front\models\EnglishHadith;
@@ -22,8 +21,8 @@ class SearchResultset
 
     /** @var array */
     private static $LANG_TABLE_DATA = array(
-        'en' => array('hadithTable' => 'EnglishHadithTable', 'urnField' => 'englishURN', 'bookField' => 'englishBookID'),
-        'ar' => array('hadithTable' => 'ArabicHadithTable', 'urnField' => 'arabicURN', 'bookField' => 'arabicBookID'),
+        'en' => array('hadithTable' => 'EnglishHadithTable', 'urnField' => 'englishURN'),
+        'ar' => array('hadithTable' => 'ArabicHadithTable', 'urnField' => 'arabicURN'),
     );
 
     public function __construct($count)
@@ -112,12 +111,8 @@ class SearchResultset
                 $enUrn = $matchingUrns[$lang][$arUrn] ?? null;
             }
 
-            $bookIdField = self::$LANG_TABLE_DATA[$lang]['bookField'];
-            // TODO: Do batch query instead to avoid N+1 problem
-            $book = Book::find()->where(
-                "{$bookIdField} = :bookId AND collection = :collection",
-                array(':bookId' => $hadith['bookID'], ':collection' => $hadith['collection'])
-            )->one();
+            $bookLanguage = ($lang === 'en') ? 'english' : 'arabic';
+            $book = $util->getBook($hadith['collection'], $hadith['bookID'], $bookLanguage);
 
             $arabicEntry = null; $englishEntry = null;
             if (isset($hadithData['ar'][$arUrn]) && !is_null($hadithData['ar'][$arUrn])) {
