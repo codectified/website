@@ -1,6 +1,8 @@
 <?php
 $pageType = $this->params['_pageType'] ?? null;
 $searchQuery = $pageType === "search" ? ($this->params['_searchQuery'] ?? '') : '';
+$searchMode = $pageType === "search" ? ($this->params['_searchMode'] ?? 'lexical') : 'lexical';
+$semanticOn = ($searchMode === 'semantic');
 
 // Get collections directly from a new Util instance
 use app\modules\front\models\Util;
@@ -24,6 +26,19 @@ $collections = $util->getCollectionsInfo('none', true);
         <button type="button" id="tipsBtn" class="custom-btn searchtipslink">
             <span class="custom-btn-content tips-icn">
                 <i class="fa-solid fa-lightbulb"></i>
+            </span>
+        </button>
+        <button type="button" id="semanticToggle"
+                class="custom-btn semantic-toggle<?php echo $semanticOn ? ' active' : ''; ?>"
+                role="switch" aria-checked="<?php echo $semanticOn ? 'true' : 'false'; ?>"
+                title="Semantic search — find hadith by meaning, not just matching keywords">
+            <span class="custom-btn-content">
+                <i class="fa-solid fa-flask semantic-icn"></i>
+                <span class="semantic-text">
+                    <span class="semantic-label">Semantic</span>
+                    <span class="semantic-desc">Find hadith by meaning</span>
+                </span>
+                <span class="semantic-switch"><span class="semantic-knob"></span></span>
             </span>
         </button>
     </div>
@@ -89,6 +104,7 @@ $collections = $util->getCollectionsInfo('none', true);
         const chipElements = document.querySelectorAll("#collectionChips .chip");
         const searchForm = document.getElementById("searchform");
         const filterIcon = document.getElementById("filterIcon");
+        const semanticToggle = document.getElementById("semanticToggle");
 
         // Parse URL parameters for collections (PHP style array params)
         const urlParams = new URLSearchParams(window.location.search);
@@ -137,6 +153,12 @@ $collections = $util->getCollectionsInfo('none', true);
             });
         });
 
+        // Semantic search toggle
+        semanticToggle.addEventListener("click", function () {
+            const on = semanticToggle.classList.toggle("active");
+            semanticToggle.setAttribute("aria-checked", on ? "true" : "false");
+        });
+
         function submit() {
             const queryInput = document.querySelector(".searchquery").value;
             let actionUrl = "/search/?q=" + encodeURIComponent(queryInput);
@@ -144,6 +166,10 @@ $collections = $util->getCollectionsInfo('none', true);
             selectedCollections.forEach((col, index) => {
                 actionUrl += `&collection[${index}]=${encodeURIComponent(col)}`;
             });
+
+            if (semanticToggle.classList.contains("active")) {
+                actionUrl += "&mode=semantic";
+            }
 
             window.location.href = actionUrl;
         }
@@ -279,6 +305,61 @@ $collections = $util->getCollectionsInfo('none', true);
         justify-content: center;
     }
 
+    /* Semantic search toggle */
+    .semantic-toggle .custom-btn-content {
+        gap: 8px;
+    }
+
+    .semantic-label {
+        font-size: 13px;
+        line-height: 1;
+    }
+
+    /* Description only appears on the dedicated mobile row */
+    .semantic-desc {
+        display: none;
+    }
+
+    .semantic-icn {
+        transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .semantic-switch {
+        position: relative;
+        display: inline-block;
+        width: 34px;
+        height: 18px;
+        border-radius: 999px;
+        background-color: var(--border-color);
+        transition: background-color 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .semantic-knob {
+        position: absolute;
+        top: 2px;
+        left: 2px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background-color: #fff;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+        transition: transform 0.2s ease;
+    }
+
+    .semantic-toggle.active .semantic-switch {
+        background-color: var(--chip-selected-bg);
+    }
+
+    .semantic-toggle.active .semantic-knob {
+        transform: translateX(16px);
+    }
+
+    .semantic-toggle.active .semantic-icn {
+        color: #6fd3c0;
+        transform: rotate(-12deg);
+    }
+
     .apply-btn {
         padding: 1rem 2rem;
         cursor: pointer;
@@ -407,6 +488,11 @@ $collections = $util->getCollectionsInfo('none', true);
             margin: 80px auto;
         }
 
+        /* Let the semantic toggle wrap onto its own row */
+        .search-container {
+            flex-wrap: wrap;
+        }
+
         .custom-btn {
             padding: 6px 8px;
         }
@@ -417,6 +503,45 @@ $collections = $util->getCollectionsInfo('none', true);
 
         .tips-icn::after {
             content: "";
+        }
+
+        /* Semantic search gets its own clearly-labelled full-width row */
+        .semantic-toggle {
+            flex-basis: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .semantic-toggle .custom-btn-content {
+            width: 100%;
+            justify-content: flex-start;
+        }
+
+        .semantic-label {
+            font-size: 14px;
+        }
+
+        .semantic-label::after {
+            content: " search";
+        }
+
+        .semantic-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 2px;
+        }
+
+        .semantic-desc {
+            display: block;
+            font-size: 12px;
+            line-height: 1.2;
+            color: var(--secondary-text-color);
+        }
+
+        .semantic-toggle .semantic-switch {
+            margin-left: auto;
         }
     }
 </style>

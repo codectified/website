@@ -26,7 +26,17 @@
  	 	<form name="searchform" action="/search/" method=get id="searchform">
        		<input type="text" class="indexsearchquery" name=q placeholder="Search &#8230;" value="" />
                 <input type="submit" class="indexsearchsubmit" value="l" />
+                <input type="hidden" name="mode" id="indexSemanticMode" value="semantic" disabled />
 		</form>
+	</div>
+	<div id="indexSemanticToggle" class="index-semantic-toggle" role="switch" aria-checked="false"
+	     tabindex="0" title="Semantic search — find hadith by meaning, not just matching keywords">
+		<i class="fa-solid fa-flask semantic-icn"></i>
+		<span class="semantic-text">
+			<span class="semantic-label">Semantic search</span>
+			<span class="semantic-desc">Find hadith by meaning</span>
+		</span>
+		<span class="semantic-switch"><span class="semantic-knob"></span></span>
 	</div>
 	<a class="indexsearchtipslink">Search Tips</a>
     <div id="indexsearchtips">
@@ -175,3 +185,115 @@
 
 	<br>
 	<div align=center style="color: #75A1A1;">Supported languages: English, Arabic, Urdu, Bangla</div>
+
+<style>
+	.index-semantic-toggle {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		margin-top: 8px;
+		padding: 8px 12px;
+		box-sizing: border-box;
+		cursor: pointer;
+		user-select: none;
+		color: var(--primary-text-color);
+		border: 1px solid rgba(127, 127, 127, 0.35);
+		border-radius: 10px;
+	}
+
+	/* Search Tips link sits on its own line beneath the toggle */
+	.indexsearchtipslink {
+		clear: both;
+		margin-top: 6px;
+	}
+
+	.index-semantic-toggle .semantic-text {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 2px;
+		line-height: 1.2;
+	}
+
+	.index-semantic-toggle .semantic-label {
+		font-size: 13px;
+	}
+
+	.index-semantic-toggle .semantic-desc {
+		font-size: 12px;
+		color: #75A1A1;
+	}
+
+	.index-semantic-toggle:focus {
+		outline: 2px solid #3ba08f;
+		outline-offset: 2px;
+	}
+
+	.index-semantic-toggle .semantic-icn {
+		color: #75A1A1;
+		transition: color 0.2s ease, transform 0.2s ease;
+	}
+
+	.index-semantic-toggle .semantic-switch {
+		position: relative;
+		display: inline-block;
+		width: 34px;
+		height: 18px;
+		border-radius: 999px;
+		background-color: rgba(127, 127, 127, 0.45);
+		transition: background-color 0.2s ease;
+		flex-shrink: 0;
+		margin-left: auto;
+	}
+
+	.index-semantic-toggle .semantic-knob {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
+		background-color: #fff;
+		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+		transition: transform 0.2s ease;
+	}
+
+	.index-semantic-toggle.active .semantic-switch {
+		background-color: #3ba08f;
+	}
+
+	.index-semantic-toggle.active .semantic-knob {
+		transform: translateX(16px);
+	}
+
+	.index-semantic-toggle.active .semantic-icn {
+		color: #3ba08f;
+		transform: rotate(-12deg);
+	}
+</style>
+
+<script>
+	(function () {
+		var toggle = document.getElementById("indexSemanticToggle");
+		var modeInput = document.getElementById("indexSemanticMode");
+		if (!toggle || !modeInput) return;
+
+		function setState(on) {
+			toggle.classList.toggle("active", on);
+			toggle.setAttribute("aria-checked", on ? "true" : "false");
+			// Only submit the mode param when semantic is on; lexical is the default.
+			modeInput.disabled = !on;
+		}
+
+		toggle.addEventListener("click", function () {
+			setState(!toggle.classList.contains("active"));
+		});
+
+		toggle.addEventListener("keydown", function (event) {
+			if (event.key === " " || event.key === "Enter") {
+				event.preventDefault();
+				setState(!toggle.classList.contains("active"));
+			}
+		});
+	})();
+</script>

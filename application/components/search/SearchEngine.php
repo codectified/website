@@ -21,6 +21,9 @@ abstract class SearchEngine
     /** @var array[] */
     protected $collections;
 
+    /** @var string Search mode: 'lexical', 'hybrid' or 'semantic' */
+    protected $mode = 'lexical';
+
     public function setLimitPage($limit, $page)
     {
         $this->limit = intval($limit);
@@ -30,6 +33,12 @@ abstract class SearchEngine
     public function setCollections($collections)
     {
         $this->collections = $collections;
+    }
+
+    public function setMode($mode)
+    {
+        $allowed = ['lexical', 'hybrid', 'semantic'];
+        $this->mode = in_array($mode, $allowed, true) ? $mode : 'lexical';
     }
 
     /**
