@@ -21,6 +21,12 @@ abstract class SearchEngine
     /** @var array[] */
     protected $collections;
 
+    /** @var string lexical|hybrid|semantic */
+    protected $searchMode = 'lexical';
+
+    /** @var string|null embedding model key, e.g. 'nomic' */
+    protected $searchModel = null;
+
     public function setLimitPage($limit, $page)
     {
         $this->limit = intval($limit);
@@ -30,6 +36,12 @@ abstract class SearchEngine
     public function setCollections($collections)
     {
         $this->collections = $collections;
+    }
+
+    public function setSearchMode($mode, $model = null)
+    {
+        $this->searchMode = $mode;
+        $this->searchModel = $model;
     }
 
     /**

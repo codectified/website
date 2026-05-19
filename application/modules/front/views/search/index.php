@@ -43,6 +43,50 @@ if (isset($errorMsg)) {
         <br><span class=breadcrumbs_search>We are still working on this feature. Please bear with us if the suggestion doesn't sound right.</span><br>";
     }
 
+    // ── Search mode / model toggles ──────────────────────────────────────────
+    $currentMode  = $searchMode  ?? 'lexical';
+    $currentModel = $searchModel ?? null;
+    $baseQ = rawurlencode($searchQuery);
+
+    $models = [
+        'openai-small-en'    => 'OpenAI small (English)',
+        'openai-small-multi' => 'OpenAI small (Multilingual)',
+        'nomic'              => 'nomic-embed-text',
+        'mxbai'              => 'mxbai-embed-large',
+    ];
+    // Default model when switching to a semantic mode
+    $effectiveModel = $currentModel ?: 'nomic';
+
+    echo '<div style="margin:10px 0 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+
+    // Mode pills
+    echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-right:4px;">Mode</span>';
+    foreach (['lexical' => 'Lexical', 'hybrid' => 'Hybrid', 'semantic' => 'Semantic'] as $modeKey => $modeLabel) {
+        $active = ($currentMode === $modeKey);
+        $href = $modeKey === 'lexical'
+            ? "/search?q={$baseQ}"
+            : "/search?q={$baseQ}&mode={$modeKey}&model={$effectiveModel}";
+        $style = $active
+            ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;'
+            : 'background:#fff;color:#555;';
+        echo "<a href=\"{$href}\" style=\"padding:4px 13px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">{$modeLabel}</a>";
+    }
+
+    // Model pills — only shown for non-lexical modes
+    if ($currentMode !== 'lexical') {
+        echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-left:10px;margin-right:4px;">Model</span>';
+        foreach ($models as $modelKey => $modelLabel) {
+            $active = ($currentModel === $modelKey);
+            $href = "/search?q={$baseQ}&mode={$currentMode}&model={$modelKey}";
+            $style = $active
+                ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;'
+                : 'background:#fff;color:#555;';
+            echo "<a href=\"{$href}\" style=\"padding:4px 13px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">{$modelLabel}</a>";
+        }
+    }
+    echo '</div>';
+    // ─────────────────────────────────────────────────────────────────────────
+
     if ($resultset->getCount() === 0) {
         echo "<p align=center>Sorry, there were no results found.";
         $googlequery = "https://www.google.com/search?q=".preg_replace("/ /", "+", htmlentities($searchQuery))."+site:sunnah.com";

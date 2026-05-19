@@ -16,7 +16,14 @@ class EnglishKeywordSearchEngine extends KeywordSearchEngine
         //$fullquery = "hadithText:".rawurlencode(self::replace_special_chars(stripslashes($query)));
         $fullquery = rawurlencode(stripslashes($this->query));
         $url = '/english/search?q='.$fullquery.'&size='.$this->limit.'&from='.$this->getStartOffset();
-        
+
+        if ($this->searchMode !== 'lexical') {
+            $url .= '&mode='.rawurlencode($this->searchMode);
+            if ($this->searchModel) {
+                $url .= '&model='.rawurlencode($this->searchModel);
+            }
+        }
+
         if (!empty($this->collections)) {
             foreach ($this->collections as $collection) {
                 $url .= '&collection='.rawurlencode($collection);

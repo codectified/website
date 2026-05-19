@@ -190,6 +190,9 @@ class Util extends Model {
         $arabic_books = Yii::$app->cache->get($collectionName."books_arabic");
         $english_books = Yii::$app->cache->get($collectionName."books_english");
         if ($books === false or $arabic_books === false or $english_books === false) {
+            $books = [];
+            $arabic_books = [];
+            $english_books = [];
 			if (strcmp($collectionName, "nasai") == 0 or strcmp($collectionName, "shamail") == 0) $books_rs = Book::find()->where('collection = :collection', [':collection' => $collectionName])->orderBy(['abs(ourBookID)' => SORT_ASC, 'englishBookID' => SORT_ASC])->all();
             else $books_rs = Book::find()->where('collection = :collection', [':collection' => $collectionName])->orderBy(['ourBookID' => SORT_ASC])->all();
             foreach ($books_rs as $book) $books[$book->ourBookID] = $book;
