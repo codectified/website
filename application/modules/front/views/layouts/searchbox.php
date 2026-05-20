@@ -11,7 +11,7 @@ $collections = $util->getCollectionsInfo('none', true);
 <div id="search">
     <div class="search-container">
         <div id="searchbar">
-            <form name="searchform" action="/search/" method="get" id="searchform">
+            <form name="searchform" action="/search" method="get" id="searchform">
                 <input type="text" class="searchquery" name="q" placeholder="Search …" value="<?php echo htmlspecialchars($searchQuery); ?>" />
                 <input type="submit" class="searchsubmit search-btn" value="l" />
             </form>
@@ -139,7 +139,7 @@ $collections = $util->getCollectionsInfo('none', true);
 
         function submit() {
             const queryInput = document.querySelector(".searchquery").value;
-            let actionUrl = "/search/?q=" + encodeURIComponent(queryInput);
+            let actionUrl = "/search?q=" + encodeURIComponent(queryInput);
 
             selectedCollections.forEach((col, index) => {
                 actionUrl += `&collection[${index}]=${encodeURIComponent(col)}`;

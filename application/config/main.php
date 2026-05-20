@@ -123,8 +123,7 @@ $config = [
             'showScriptName' => false,
 			'normalizer' => [
         		'class' => 'yii\web\UrlNormalizer',
-        		// use temporary redirection instead of permanent for debugging
-        		'action' => UrlNormalizer::ACTION_REDIRECT_TEMPORARY,
+        		'action' => UrlNormalizer::ACTION_REDIRECT_PERMANENT,
     		],
             'rules' => array(
                 // '(.*)' => 'front/index/maint',
