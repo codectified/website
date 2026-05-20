@@ -23,7 +23,7 @@
 
 	<div class="indexsearchcontainer">
 	<div id="indexsearch">
- 	 	<form name="searchform" action="/search/" method=get id="searchform">
+ 	 	<form name="searchform" action="/search" method=get id="searchform">
        		<input type="text" class="indexsearchquery" name=q placeholder="Search &#8230;" value="" />
                 <input type="submit" class="indexsearchsubmit" value="l" />
 		</form>
