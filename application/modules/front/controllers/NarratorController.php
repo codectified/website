@@ -13,8 +13,7 @@ class NarratorController extends SController
     {
         return [
             [
-                'class'      => 'yii\filters\PageCache',
-                'except'     => [],
+                'class'      => 'app\components\CdnOriginAndEdgeCache',
                 'duration'   => Yii::$app->params['cacheTTL'],
                 'variations' => [Yii::$app->request->get('nid')],
             ],

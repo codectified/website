@@ -20,7 +20,7 @@ class CollectionController extends SController
     public function behaviors() {
         return [
             [
-                   'class' => 'yii\filters\PageCache',
+                   'class' => 'app\components\CdnOriginAndEdgeCache',
                    'except' => ['selection-data'],
                    'duration' => Yii::$app->params['cacheTTL'],
                    'variations' => [ 

@@ -15,7 +15,7 @@ class IndexController extends SController
     public function behaviors() {
         return [
             [
-                   'class' => 'yii\filters\PageCache',
+                   'class' => 'app\components\CdnOriginAndEdgeCache',
                    'except' => ['flush-cache', 'ajaxhadithcount', 'contact', 'captcha'],
                    'duration' => Yii::$app->params['cacheTTL'],
                    'variations' => [ Yii::$app->request->get('id') ],

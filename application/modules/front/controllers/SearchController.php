@@ -11,6 +11,17 @@ use Yii;
 
 class SearchController extends SController
 {
+    public function behaviors()
+    {
+        return [
+            [
+                'class'    => 'app\components\CdnEdgeCache',
+                'only'     => ['search'],
+                'duration' => Yii::$app->params['searchCacheTTL'],
+            ],
+        ];
+    }
+
     public function actionOldsearch($query, $page = 1)
     {
         $query = stripslashes($this->url_decode($query));
@@ -49,6 +60,7 @@ class SearchController extends SController
         	$resultset = $searchEngine->doSearch($query);
 		} catch (\ErrorException $e) {
 			$errorMsg = "Your search query cannot be performed. It may contain improper characters, be too long, or be malformed in another way.";
+			Yii::$app->response->statusCode = 400;
 			return $this->render('index', ['errorMsg' => $errorMsg]);
 		} finally {
 			restore_error_handler();
@@ -90,6 +102,7 @@ class SearchController extends SController
     protected function searchEngineDown()
     {
         $errorMsg = 'The search engine is currently down. The web administrators have been notified and will be working to get it back up as soon as possible, inshaAllah.';
+        Yii::$app->response->statusCode = 503;
         return $this->render('index', ['errorMsg' => $errorMsg]);
     }
 
