@@ -42,6 +42,11 @@ class ElasticConnection extends BaseObject
             $headers[] = 'X-Real-IP: ' . $clientIp;
         }
 
+        $userAgent = Yii::$app->getRequest()->getUserAgent();
+        if (!empty($userAgent)) {
+            $headers[] = 'User-Agent: ' . $userAgent;
+        }
+
         return $headers;
     }
 
