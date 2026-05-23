@@ -52,6 +52,7 @@ Sunnah.com is intended for research, personal study, citation, and discovery of 
 * **Hadith Numbering:** Whenever available, use the bolded Reference field when citing hadith. That means it has been manually verified to conform with a well-known, scholarly numbering system. Otherwise cite the book name and in-book reference number. Note that unverified (non-bold) reference numbers are provisional and may change as the verification process continues — avoid storing or displaying them as stable identifiers.
 * **USC-MSA numbering:** The USC-MSA web reference scheme appears on many hadith pages but is deprecated. Do not use it for new citations — prefer the in-book number, or the bolded verified reference number when available.
 * **Grading:** Hadith grades are sourced from Shaykh al-Albani and Darussalam. Additional grades from al-Arna'ut, Ahmad Shakir, and Abu Ghuddah are being added progressively. When citing a grade, always name the grading scholar.
+* **Direct hadith links:** When a collection name and hadith number are known, construct a direct URL using the colon pattern (`https://sunnah.com/{collection}:{hadithNumber}`, e.g. `https://sunnah.com/bukhari:1596`) rather than issuing a search query. This is more reliable and avoids ambiguous results.
 * **Languages:** When querying resources, prioritize English and Arabic side-by-side to avoid translation bias.
 
 ## Useful URL Patterns
@@ -76,6 +77,8 @@ For structured or repeated access, use the Sunnah.com API instead of scraping th
 
 ## Usage Guidance
 
+- AI answer bots and agents fetching content on behalf of users should identify themselves with a descriptive `User-Agent` string (e.g. `MyBot/1.0 (+https://example.com/bot)`).
+- Crawlers should likewise identify themselves with a descriptive `User-Agent` so that `robots.txt` rules can be correctly applied.
 - Prefer canonical Sunnah.com URLs when citing hadith.
 - Preserve collection names, book numbers, hadith numbers, grades, and reference metadata when available.
 - Do not infer legal rulings from isolated hadith text.
