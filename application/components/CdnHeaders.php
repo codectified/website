@@ -22,7 +22,7 @@ class CdnHeaders
             if ($r->statusCode !== 200 && $r->statusCode !== 301) {
                 return;
             }
-            $r->headers->set('Cache-Control', 'public, max-age=28800');
+            $r->headers->set('Cache-Control', 'public, max-age=14400');
             $r->headers->set('Cloudflare-CDN-Cache-Control', 'public, max-age=' . $duration);
             $r->headers->set('Cache-Tag', $cacheTag);
             // Strip the CSRF cookie. The layout's csrfMetaTags() call generates a
