@@ -282,7 +282,7 @@ $showBio    = $hasLineage || $hasMeta || $hasPills;
 
   <!-- Meta row -->
   <?php if ($hasMeta): ?>
-  <div class="bio-row">
+  <div class="bio-row bio-row--sb">
     <div class="meta-grid">
       <?php if ($hasProfession): ?>
       <div>
@@ -340,7 +340,7 @@ $showBio    = $hasLineage || $hasMeta || $hasPills;
 
   <!-- Nasab row -->
   <?php if ($hasNasab): ?>
-  <div class="bio-row">
+  <div class="bio-row bio-row--sb">
     <div>
       <span class="label label--m1">Affiliations</span>
       <p class="field"><?= htmlspecialchars($enNasab) ?></p>
@@ -354,7 +354,7 @@ $showBio    = $hasLineage || $hasMeta || $hasPills;
 
   <!-- Pills row -->
   <?php if ($hasPills): ?>
-  <div class="bio-row">
+  <div class="bio-row bio-row--sb">
     <div class="pills">
       <?php if ($narrator->in_bukhari): ?>
       <span class="pill-outline">Narrates in al-Bukhari</span>
@@ -516,7 +516,7 @@ $opinionTotal    = count($criticOpinions);
   </div>
   <div class="coming-soon-pair">
     <p class="coming-soon">Coming soon in sha Allah</p>
-    <p class="coming-soon arabic" dir="rtl">قريباً إن شاء</p>
+    <p class="coming-soon arabic" dir="rtl">قريباً إن شاء الله</p>
   </div>
 </section>
 <!-- ════════════════════════════════════════════════════════════ -->

@@ -577,6 +577,7 @@
   /* Hero titles */
   .narrator-page .hero-title            { font-size: 1.75rem; text-align: center; }
   .narrator-page .hero-title.arabic     { font-size: 2.25rem; text-align: center; }
+  .narrator-page .hero-alt-name         { text-align: center; }
 
   /* Section heads: tighten spacing, keep EN + AR on one line */
   .narrator-page .section-head          { margin-bottom: 1.25rem; gap: 0.5rem; }
@@ -659,6 +660,27 @@
   .narrator-page .name-ar.arabic        { font-size: 1.25rem; }
   .narrator-page .ar-para.arabic        { font-size: 1.25rem; }
   .narrator-page .sublabel.arabic       { font-size: 1.375rem; }
+
+  /* Side-by-side bio rows: Cities/Regions, Affiliations, Bukhari/Muslim pills */
+  .narrator-page .bio-row--sb {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+  }
+  /* Use direction-relative alignment so EN left-aligns and AR right-aligns naturally */
+  .narrator-page .bio-row--sb > div,
+  .narrator-page .bio-row--sb .meta-grid .label,
+  .narrator-page .bio-row--sb .meta-grid .field { text-align: start; }
+  /* Pills: align to column start (left for EN, right for AR in RTL flex context) */
+  .narrator-page .bio-row--sb .pills { justify-content: flex-start; }
+
+  /* Meta-grid side-by-side: slightly smaller Arabic labels than the 16px default so rows
+     roughly track their EN counterparts; field values larger than the general mobile scale-down */
+  .narrator-page .bio-row--sb .meta-grid .label.arabic-label {
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 0.25rem;
+  }
+  .narrator-page .bio-row--sb .meta-grid .field.arabic { font-size: 1.375rem; }
 }
 
 /* =====================================================
