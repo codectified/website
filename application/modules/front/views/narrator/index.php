@@ -202,12 +202,13 @@ $studentTotal   = count($studentRows);
         <span class="field"><?= htmlspecialchars($enKunya) ?></span>
       </div>
       <?php endif; ?>
-      <?php if ($hasTabaka || ($hasBirth || $hasDeath)): ?>
+      <?php if ($hasTabaka || ($hasBirth || $hasDeath) || !empty($narrator->gender)): ?>
       <div>
         <?php if ($hasTabaka): ?><span class="label">Generation</span><?php endif; ?>
         <div class="field-line">
           <?php if ($hasTabaka): ?><span class="field"><?= htmlspecialchars($tabEn) ?></span><?php endif; ?>
           <?php if ($hasBirth || $hasDeath): ?><span class="pill-secondary"><?= htmlspecialchars($dateEnStr) ?></span><?php endif; ?>
+          <?php if (!empty($narrator->gender)): ?><span class="mso mso-md"><?= $narrator->gender === 'M' ? 'male' : 'female' ?></span><?php endif; ?>
         </div>
       </div>
       <?php endif; ?>
@@ -226,12 +227,13 @@ $studentTotal   = count($studentRows);
           <span class="field arabic"><?= htmlspecialchars($narrator->kunya) ?></span>
         </div>
         <?php endif; ?>
-        <?php if ($hasTabaka || ($hasBirth || $hasDeath)): ?>
+        <?php if ($hasTabaka || ($hasBirth || $hasDeath) || !empty($narrator->gender)): ?>
         <div>
           <?php if ($hasTabaka): ?><span class="label arabic-label">الطبقة</span><?php endif; ?>
           <div class="field-line">
             <?php if ($hasTabaka): ?><span class="field arabic"><?= htmlspecialchars($tabAr) ?></span><?php endif; ?>
             <?php if ($hasBirth || $hasDeath): ?><span class="pill-secondary arabic"><?= htmlspecialchars($arDateStr) ?></span><?php endif; ?>
+            <?php if (!empty($narrator->gender)): ?><span class="mso mso-md"><?= $narrator->gender === 'M' ? 'male' : 'female' ?></span><?php endif; ?>
           </div>
         </div>
         <?php endif; ?>
@@ -513,8 +515,8 @@ $opinionTotal    = count($criticOpinions);
     <h3 class="section-title section-title--ar arabic" dir="rtl">الأحاديث المروية</h3>
   </div>
   <div class="coming-soon-pair">
-    <p class="coming-soon">Coming soon</p>
-    <p class="coming-soon arabic" dir="rtl">قريباً</p>
+    <p class="coming-soon">Coming soon in sha Allah</p>
+    <p class="coming-soon arabic" dir="rtl">قريباً إن شاء</p>
   </div>
 </section>
 <!-- ════════════════════════════════════════════════════════════ -->
