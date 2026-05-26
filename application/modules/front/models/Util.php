@@ -384,6 +384,15 @@ class Util extends Model {
 			$englishText = $englishEntry->hadithText;
 			$truncation = false;
 
+			// For hadith with matn/prematn shortcodes, show only from the matn onwards
+			if ($arabicEntry->shortcode_parsed) {
+				$matnPos = strpos($arabicText, '<span class="arabic_text_details">');
+				if ($matnPos !== false) {
+					$arabicText = substr($arabicText, $matnPos);
+					$truncation = true;
+				}
+			}
+
 			if (strlen($arabicText) <= 530) $arabicSnippet = $arabicText;
             else {
             	$pos = strpos($arabicText, ' ', 530);
