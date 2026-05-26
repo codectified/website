@@ -332,6 +332,36 @@ class Util extends Model {
         return $hadith->permalink;
     }
 
+    private function truncateHtml($text, $pos) {
+        $snippet = substr($text, 0, $pos);
+
+        // If we cut inside an HTML tag, back up to before the <
+        $lastOpen = strrpos($snippet, '<');
+        $lastClose = strrpos($snippet, '>');
+        if ($lastOpen !== false && ($lastClose === false || $lastOpen > $lastClose)) {
+            $snippet = rtrim(substr($snippet, 0, $lastOpen));
+        }
+
+        // Close any unclosed inline tags using a stack
+        $voidElements = ['br', 'hr', 'img', 'input', 'link', 'meta', 'area', 'base', 'col', 'embed', 'param', 'source', 'track', 'wbr'];
+        preg_match_all('/<\/?([a-z][a-z0-9]*)\b[^>]*>/i', $snippet, $matches, PREG_SET_ORDER);
+        $stack = [];
+        foreach ($matches as $match) {
+            $tag = strtolower($match[1]);
+            if (in_array($tag, $voidElements)) continue;
+            if ($match[0][1] === '/') {
+                if (!empty($stack) && end($stack) === $tag) array_pop($stack);
+            } else {
+                $stack[] = $tag;
+            }
+        }
+        foreach (array_reverse($stack) as $tag) {
+            $snippet .= "</$tag>";
+        }
+
+        return $snippet;
+    }
+
     public function getCarouselHTML($arabicURNs) {
         $aURNs = $arabicURNs;
 		shuffle($aURNs);
@@ -359,7 +389,7 @@ class Util extends Model {
             	$pos = strpos($arabicText, ' ', 530);
                 if ($pos === FALSE) $arabicSnippet = $arabicText;
                 else {
-					$arabicSnippet = substr($arabicText, 0, $pos)." &hellip;";
+					$arabicSnippet = $this->truncateHtml($arabicText, $pos)." &hellip;";
 					$truncation = true;
 				}
             }
@@ -369,7 +399,7 @@ class Util extends Model {
             	$pos = strpos($englishText, ' ', 300);
                 if ($pos === FALSE) $englishSnippet = $englishText;
                 else {
-					$englishSnippet = substr($englishText, 0, $pos)." &hellip;";
+					$englishSnippet = $this->truncateHtml($englishText, $pos)." &hellip;";
 					$truncation = true;
 				}
             }
