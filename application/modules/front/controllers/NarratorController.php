@@ -54,6 +54,7 @@ class NarratorController extends SController
         $tarjamaBlocks  = $narrator->getTarjamaBlocks();
         $teacherRows    = $this->resolveRows($narrator->getTeacherIds(), $summaryMap);
         $studentRows    = $this->resolveRows($narrator->getStudentIds(), $summaryMap);
+        $narratedHadith = $narrator->getNarratedHadithPreview($this->util);
 
         return $this->render('index', [
             'narrator'       => $narrator,
@@ -61,6 +62,7 @@ class NarratorController extends SController
             'teacherRows'    => $teacherRows,
             'studentRows'    => $studentRows,
             'tarjamaBlocks'  => $tarjamaBlocks,
+            'narratedHadith' => $narratedHadith,
         ]);
     }
 

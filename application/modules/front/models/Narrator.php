@@ -105,6 +105,180 @@ class Narrator extends ActiveRecord
         return $opinions;
     }
 
+    /**
+     * Returns a cached, linked preview of hadith narrated by this narrator.
+     *
+     * @return array ['rows' => array, 'limit' => int]
+     */
+    public function getNarratedHadithPreview(Util $util, $limit = 10)
+    {
+        $limit = max(1, min(10, (int)$limit));
+        $cacheKey = 'narrator:hadith_preview:v1:narrator:' . (int)$this->narrator_id . ':limit:' . $limit;
+        $cached = Yii::$app->cache->get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
+
+        $queryTimeoutMs = 3000;
+        try {
+            $clusterLimit = max(40, $limit * 4);
+            $clusterRows = Yii::$app->db->createCommand("
+                SELECT /*+ MAX_EXECUTION_TIME($queryTimeoutMs) */ cl.cluster_id, cl.taraf
+                FROM clusters cl
+                INNER JOIN (
+                    SELECT DISTINCT cluster_id
+                    FROM narrator_ahadith
+                    WHERE narrator_id = :nid
+                        AND cluster_id IS NOT NULL
+                ) nc ON nc.cluster_id = cl.cluster_id
+                ORDER BY cl.prominence_score DESC
+                LIMIT $clusterLimit
+            ", [':nid' => (int)$this->narrator_id])->queryAll();
+
+            if (empty($clusterRows)) {
+                $empty = ['rows' => [], 'limit' => $limit];
+                Yii::$app->cache->set($cacheKey, $empty, Yii::$app->params['cacheTTL']);
+                return $empty;
+            }
+
+            $clusterIds = [];
+            $clusterOrder = [];
+            $clusterTaraf = [];
+            foreach ($clusterRows as $index => $clusterRow) {
+                $clusterId = (int)$clusterRow['cluster_id'];
+                $clusterIds[] = $clusterId;
+                $clusterOrder[$clusterId] = $index;
+                $clusterTaraf[$clusterId] = $clusterRow['taraf'] ?? '';
+            }
+
+            $params = [':nid' => (int)$this->narrator_id];
+            $placeholders = [];
+            foreach ($clusterIds as $index => $clusterId) {
+                $placeholder = ':cluster' . $index;
+                $placeholders[] = $placeholder;
+                $params[$placeholder] = $clusterId;
+            }
+
+            $candidateRows = Yii::$app->db->createCommand("
+                SELECT /*+ MAX_EXECUTION_TIME($queryTimeoutMs) */ na.cluster_id AS narratorClusterID,
+                       na.bhid,
+                       c.name AS collection,
+                       c.collectionID
+                FROM narrator_ahadith na
+                INNER JOIN Collections c ON c.gk_collection_id = na.gk_collection_id
+                WHERE na.narrator_id = :nid
+                    AND na.cluster_id IN (" . implode(', ', $placeholders) . ")
+                ORDER BY c.collectionID, na.bhid
+            ", $params)->queryAll();
+
+            $bestByCluster = [];
+            foreach ($candidateRows as $row) {
+                $clusterId = (int)$row['narratorClusterID'];
+                if (!isset($bestByCluster[$clusterId])) {
+                    $bestByCluster[$clusterId] = $row;
+                }
+            }
+
+            $selectedRows = array_values($bestByCluster);
+            usort($selectedRows, function ($a, $b) use ($clusterOrder) {
+                $aOrder = $clusterOrder[(int)$a['narratorClusterID']] ?? PHP_INT_MAX;
+                $bOrder = $clusterOrder[(int)$b['narratorClusterID']] ?? PHP_INT_MAX;
+                return $aOrder <=> $bOrder;
+            });
+            $selectedRows = array_slice($selectedRows, 0, $limit);
+
+            $hadithParams = [];
+            $hadithPlaceholders = [];
+            foreach ($selectedRows as $index => $row) {
+                $placeholder = ':bhid' . $index;
+                $hadithPlaceholders[] = $placeholder;
+                $hadithParams[$placeholder] = $row['bhid'];
+            }
+
+            if (empty($hadithPlaceholders)) {
+                $empty = ['rows' => [], 'limit' => $limit];
+                Yii::$app->cache->set($cacheKey, $empty, Yii::$app->params['cacheTTL']);
+                return $empty;
+            }
+
+            $hadithRows = Yii::$app->db->createCommand("
+                SELECT /*+ MAX_EXECUTION_TIME($queryTimeoutMs) */ gk_hadith_id, arabicURN, collection, bookID, bookNumber, hadithNumber, ourHadithNumber
+                FROM ArabicHadithTable
+                WHERE gk_hadith_id IN (" . implode(', ', $hadithPlaceholders) . ")
+            ", $hadithParams)->queryAll();
+        } catch (\yii\db\Exception $e) {
+            Yii::warning('Narrated hadith preview failed for narrator ' . (int)$this->narrator_id . ': ' . $e->getMessage(), __METHOD__);
+            $empty = ['rows' => [], 'limit' => $limit];
+            Yii::$app->cache->set($cacheKey, $empty, max(1, min(300, (int)Yii::$app->params['cacheTTL'])));
+            return $empty;
+        }
+
+        $hadithByBhid = [];
+        foreach ($hadithRows as $hadithRow) {
+            $hadithByBhid[$hadithRow['gk_hadith_id'] . '|' . $hadithRow['collection']] = $hadithRow;
+        }
+
+        $previewRows = [];
+        foreach ($selectedRows as $row) {
+            $clusterId = (int)$row['narratorClusterID'];
+            $hadithRowKey = $row['bhid'] . '|' . $row['collection'];
+            if (!isset($hadithByBhid[$hadithRowKey])) {
+                continue;
+            }
+            $hadithRow = $hadithByBhid[$hadithRowKey];
+            $hadith = new ArabicHadith([
+                'arabicURN'       => $hadithRow['arabicURN'],
+                'collection'      => $hadithRow['collection'],
+                'bookID'          => $hadithRow['bookID'],
+                'bookNumber'      => $hadithRow['bookNumber'],
+                'hadithNumber'    => $hadithRow['hadithNumber'],
+                'ourHadithNumber' => $hadithRow['ourHadithNumber'],
+            ]);
+            $collection = $util->getCollection($hadith->collection);
+            $book = $util->getBook($hadith->collection, $hadith->bookID, 'arabic');
+            if ($collection === null || $book === null) {
+                continue;
+            }
+
+            $hadith->populate($util, $collection, $book);
+            $reference = $hadith->canonicalReference ?: $hadith->sunnahReference ?: $hadith->arabicReference;
+            if (empty($reference)) {
+                $reference = $collection->englishTitle . ' ' . $hadith->hadithNumber;
+            }
+            if ((int)$book->status === 6
+                && !empty($collection->englishTitle)
+                && strpos($reference, $collection->englishTitle) !== 0) {
+                $reference = $collection->englishTitle . ' ' . $reference;
+            }
+
+            $previewRows[] = [
+                'reference'    => $reference,
+                'permalink'    => $hadith->permalink ?: '/urn/' . $hadith->arabicURN,
+                'tarafSnippet' => self::snippetArabic($clusterTaraf[$clusterId] ?? ''),
+            ];
+        }
+
+        $result = [
+            'rows'  => $previewRows,
+            'limit' => $limit,
+        ];
+        Yii::$app->cache->set($cacheKey, $result, Yii::$app->params['cacheTTL']);
+        return $result;
+    }
+
+    private static function snippetArabic($text, $words = 14)
+    {
+        $text = trim(strip_tags((string)$text));
+        if ($text === '') {
+            return '';
+        }
+        $parts = preg_split('/\s+/u', $text);
+        if (count($parts) <= $words) {
+            return $text;
+        }
+        return implode(' ', array_slice($parts, 0, $words)) . ' ...';
+    }
+
     // ──────────────────────────────────────────────────── TRANSLITERATION
 
     private static function getWordDict(): array

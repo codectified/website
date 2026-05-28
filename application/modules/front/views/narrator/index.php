@@ -5,6 +5,7 @@
 /** @var array $teacherRows    [['narrator_id' => int, 'byname' => string], ...] */
 /** @var array $studentRows    [['narrator_id' => int, 'byname' => string], ...] */
 /** @var array $tarjamaBlocks  [['label' => string, 'html' => string], ...] */
+/** @var array $narratedHadith ['rows' => array, 'limit' => int] */
 
 $this->registerJs(<<<'JS'
 document.addEventListener("click", (e) => {
@@ -128,6 +129,10 @@ $hasEpithet   = !empty($narrator->epithet);
 $hasDescriptor = !empty($narrator->descriptor);
 $hasIkhtilat  = !empty($narrator->ikhtilat);
 $hasTadlis    = !empty($narrator->tadlis);
+$narrationCount = is_numeric($narrator->narration_count ?? null) ? (int)$narrator->narration_count : 0;
+$hasNarrationCount = $narrationCount > 0;
+$narrationCountEn = number_format($narrationCount) . ' hadith';
+$narrationCountAr = $toArNums(str_replace(',', '٬', number_format($narrationCount))) . ' حديثًا';
 
 // Teachers / students: first 5 visible, remainder hidden
 $PREVIEW = 5;
@@ -508,18 +513,31 @@ $opinionTotal    = count($criticOpinions);
 <!-- ════════════════════════════════════════════════════════════ -->
 <?php endif; ?>
 
+<?php if (!empty($narratedHadith['rows'])): ?>
 <!-- ══════════════════════════════════════ HADITH NARRATED -->
 <section class="mb-section">
   <div class="section-head">
-    <h3 class="section-title">Hadith Narrated</h3>
-    <h3 class="section-title section-title--ar arabic" dir="rtl">الأحاديث المروية</h3>
+    <h3 class="section-title"><?= $hasNarrationCount ? htmlspecialchars(number_format($narrationCount) . ' Hadith Narrated') : 'Hadith Narrated' ?></h3>
+    <h3 class="section-title section-title--ar arabic" dir="rtl"><?= $hasNarrationCount ? htmlspecialchars($narrationCountAr . ' مرويًا') : 'الأحاديث المروية' ?></h3>
   </div>
-  <div class="coming-soon-pair">
-    <p class="coming-soon">Coming soon in sha Allah</p>
-    <p class="coming-soon arabic" dir="rtl">قريباً إن شاء الله</p>
+
+  <ul class="narrated-hadith-list">
+    <?php foreach ($narratedHadith['rows'] as $row): ?>
+    <li class="narrated-hadith-row">
+      <a class="narrated-hadith-link" href="<?= htmlspecialchars($row['permalink']) ?>">
+        <span class="narrated-hadith-ref"><?= htmlspecialchars($row['reference']) ?></span>
+        <span class="narrated-hadith-snippet arabic" dir="rtl"><?= htmlspecialchars($row['tarafSnippet'] ?? '') ?></span>
+      </a>
+    </li>
+    <?php endforeach; ?>
+  </ul>
+  <div class="narrated-hadith-more">
+    <span class="narrated-hadith-more-link">View all narrations</span>
+    <span class="narrated-hadith-more-link arabic" dir="rtl">عرض جميع الأحاديث المروية</span>
   </div>
 </section>
 <!-- ════════════════════════════════════════════════════════════ -->
+<?php endif; ?>
 
 <?php if (!empty($tarjamaBlocks)): ?>
 <!-- ══════════════════════════════════════ TARJAMA ACCORDIONS -->
