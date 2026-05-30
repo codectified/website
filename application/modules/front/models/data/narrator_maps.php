@@ -137,6 +137,7 @@ return [
         'الرؤاسي'   => "al-Ru'asi",
         'الخزرجي'   => 'al-Khazraji',
         'الديلي'    => 'al-Dayli',
+        'الزماني'   => 'az-Zimmani',
         // Nisbas extracted from formerly hard-coded full-name entries
         'المديني'   => 'al-Madini',
         'العسقلاني' => 'al-`Asqalani',

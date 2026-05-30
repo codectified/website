@@ -813,14 +813,25 @@
   .narrator-page .panel-label  { font-size: 1.25rem; }
   .narrator-page .panel-label-ar { font-size: 1.5rem; }
 
-  /* Teacher/student name rows: stack EN above AR */
+  /* Teacher/student name rows: keep EN + AR paired while allowing either side to wrap */
   .narrator-page .row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.125rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
     padding: 0.5rem 0;
   }
-  .narrator-page .name-ar { text-align: right; width: 100%; }
+  .narrator-page .name-en,
+  .narrator-page .name-ar {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+  .narrator-page .name-en { justify-self: start; }
+  .narrator-page .name-ar {
+    justify-self: end;
+    text-align: right;
+    width: auto;
+  }
 
   /* Coming-soon pair: stack EN above AR */
   .narrator-page .coming-soon-pair {
@@ -896,11 +907,19 @@
     max-width: none;
   }
   .narrator-page .narrated-hadith-more {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.25rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
   }
-  .narrator-page .narrated-hadith-more-link.arabic { text-align: right; }
+  .narrator-page .narrated-hadith-more-link {
+    min-width: 0;
+    overflow-wrap: break-word;
+  }
+  .narrator-page .narrated-hadith-more-link.arabic {
+    justify-self: end;
+    text-align: right;
+  }
   .narrator-page .narrator-hadith-clusters { grid-template-columns: 1fr; }
   .narrator-page .narrator-cluster-title { font-size: 1.6rem; }
   .narrator-page .narrator-cluster-link-list { justify-content: start; }
