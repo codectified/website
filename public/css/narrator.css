@@ -874,6 +874,33 @@
 
   .narrator-page .narrator-count-pill { min-width: 9rem; flex: 1 1 9rem; }
   .narrator-page .narrator-count-value { font-size: 1.6rem; }
+  .narrator-page .narrated-hadith-list {
+    display: block;
+    text-align: initial;
+  }
+  .narrator-page .narrated-hadith-row { display: block; }
+  .narrator-page .narrated-hadith-link {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 0.75rem;
+    align-items: baseline;
+  }
+  .narrator-page .narrated-hadith-ref {
+    grid-column: 1;
+    justify-self: start;
+    text-align: left;
+  }
+  .narrator-page .narrated-hadith-snippet {
+    grid-column: 2;
+    justify-self: stretch;
+    max-width: none;
+  }
+  .narrator-page .narrated-hadith-more {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.25rem;
+  }
+  .narrator-page .narrated-hadith-more-link.arabic { text-align: right; }
   .narrator-page .narrator-hadith-clusters { grid-template-columns: 1fr; }
   .narrator-page .narrator-cluster-title { font-size: 1.6rem; }
   .narrator-page .narrator-cluster-link-list { justify-content: start; }
