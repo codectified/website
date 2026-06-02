@@ -19,6 +19,9 @@ class SearchResultset
     /** @var array */
     protected $results;
 
+    /** @var object|null — aggregation buckets from the search API (gradeNorm, collection) */
+    protected $facets = null;
+
     /** @var array */
     private static $LANG_TABLE_DATA = array(
         'en' => array('hadithTable' => 'EnglishHadithTable', 'urnField' => 'englishURN'),
@@ -54,6 +57,16 @@ class SearchResultset
     public function getSuggestions()
     {
         return $this->suggestions;
+    }
+
+    public function setFacets($facets)
+    {
+        $this->facets = $facets;
+    }
+
+    public function getFacets()
+    {
+        return $this->facets;
     }
 
     /**

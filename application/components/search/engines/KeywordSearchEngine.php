@@ -30,6 +30,7 @@ class KeywordSearchEngine extends SearchEngine
         $engine->setLimitPage($this->limit, $this->page);
         $engine->setCollections($this->collections);
         $engine->setSearchMode($this->searchMode, $this->searchModel);
+        $engine->setGradeNorm($this->gradeNorm);
 
         $resultset = $engine->doSearch($this->query);
 
@@ -61,6 +62,10 @@ class KeywordSearchEngine extends SearchEngine
         $hits = $resultsarray->hits;
         $docs = $hits->hits;
         $resultset = new SearchResultset($hits->total->value);
+
+        if (isset($resultsarray->aggregations)) {
+            $resultset->setFacets($resultsarray->aggregations);
+        }
 
         if ($this->hasSuggestionsSupport()) {
             // Check english, then arabic suggestions

@@ -21,6 +21,9 @@ abstract class SearchEngine
     /** @var array[] */
     protected $collections;
 
+    /** @var array[] */
+    protected $gradeNorm = [];
+
     /** @var string lexical|hybrid|semantic */
     protected $searchMode = 'lexical';
 
@@ -36,6 +39,11 @@ abstract class SearchEngine
     public function setCollections($collections)
     {
         $this->collections = $collections;
+    }
+
+    public function setGradeNorm($gradeNorm)
+    {
+        $this->gradeNorm = is_array($gradeNorm) ? $gradeNorm : ($gradeNorm ? [$gradeNorm] : []);
     }
 
     public function setSearchMode($mode, $model = null)

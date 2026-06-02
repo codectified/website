@@ -29,7 +29,13 @@ class EnglishKeywordSearchEngine extends KeywordSearchEngine
                 $url .= '&collection='.rawurlencode($collection);
             }
         }
-        
+
+        if (!empty($this->gradeNorm)) {
+            foreach ($this->gradeNorm as $grade) {
+                $url .= '&gradeNorm='.rawurlencode($grade);
+            }
+        }
+
         $resultscode = $this->elastic->sendRequest($url);
 
         if ($resultscode === false) {
