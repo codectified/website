@@ -24,6 +24,9 @@ abstract class SearchEngine
     /** @var string|null */
     protected $mode;
 
+    /** @var array[] */
+    protected $gradeNorm = [];
+
     public function setLimitPage($limit, $page)
     {
         $this->limit = intval($limit);
@@ -33,6 +36,11 @@ abstract class SearchEngine
     public function setCollections($collections)
     {
         $this->collections = $collections;
+    }
+
+    public function setGradeNorm($gradeNorm)
+    {
+        $this->gradeNorm = is_array($gradeNorm) ? $gradeNorm : ($gradeNorm ? [$gradeNorm] : []);
     }
 
     public function setMode($mode)

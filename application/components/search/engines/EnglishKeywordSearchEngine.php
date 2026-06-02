@@ -27,6 +27,12 @@ class EnglishKeywordSearchEngine extends KeywordSearchEngine
             $url .= '&mode='.rawurlencode($this->mode);
         }
 
+        if (!empty($this->gradeNorm)) {
+            foreach ($this->gradeNorm as $grade) {
+                $url .= '&gradeNorm='.rawurlencode($grade);
+            }
+        }
+
         $resultscode = $this->elastic->sendRequest($url);
 
         if ($resultscode === false) {

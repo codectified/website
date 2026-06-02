@@ -43,6 +43,46 @@ if (isset($errorMsg)) {
         <br><span class=breadcrumbs_search>We are still working on this feature. Please bear with us if the suggestion doesn't sound right.</span><br>";
     }
 
+
+    // ── Grade filter facets ──────────────────────────────────────────────────
+    $baseQ        = rawurlencode($searchQuery);
+    $facets       = $facets ?? null;
+    $activeGrades = $activeGradeNorm ?? [];
+    if ($facets && isset($facets->gradeNorm->buckets) && count($facets->gradeNorm->buckets) > 0) {
+        echo '<div style="margin:0 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
+        echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-right:4px;">Grade</span>';
+
+        // "All" pill — clears the grade filter
+        $allActive = empty($activeGrades);
+        $allStyle  = $allActive ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;' : 'background:#fff;color:#555;';
+        echo "<a href=\"/search?q={$baseQ}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$allStyle}\">All</a>";
+
+        $gradeOrder = ["Sahih", "Hasan", "Da'if", "Maudu'", "Uncategorized"];
+        $bucketMap  = [];
+        foreach ($facets->gradeNorm->buckets as $b) {
+            $bucketMap[$b->key] = $b->doc_count;
+        }
+
+        foreach ($gradeOrder as $grade) {
+            if (!isset($bucketMap[$grade])) continue;
+            $count  = $bucketMap[$grade];
+            $active = in_array($grade, $activeGrades);
+            $style  = $active ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;' : 'background:#fff;color:#555;';
+            if ($active) {
+                $newGrades = array_diff($activeGrades, [$grade]);
+            } else {
+                $newGrades = array_merge($activeGrades, [$grade]);
+            }
+            $gradeQS = '';
+            foreach ($newGrades as $g) $gradeQS .= '&gradeNorm=' . rawurlencode($g);
+            echo "<a href=\"/search?q={$baseQ}{$gradeQS}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">"
+                . htmlspecialchars($grade)
+                . " <span style=\"font-size:10px;opacity:.7;\">({$count})</span></a>";
+        }
+        echo '</div>';
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
     if ($resultset->getCount() === 0) {
         echo "<p align=center>Sorry, there were no results found.";
         $googlequery = "https://www.google.com/search?q=".preg_replace("/ /", "+", htmlentities($searchQuery))."+site:sunnah.com";

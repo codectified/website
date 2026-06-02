@@ -18,6 +18,10 @@ class SearchResultset
     /** @var array */
     protected $results;
 
+    /** @var object|null — aggregation buckets from the search API (gradeNorm, collection) */
+    protected $facets = null;
+
+
     public function __construct($count)
     {
         $this->results = [];
@@ -48,6 +52,16 @@ class SearchResultset
     public function getSuggestions()
     {
         return $this->suggestions;
+    }
+
+    public function setFacets($facets)
+    {
+        $this->facets = $facets;
+    }
+
+    public function getFacets()
+    {
+        return $this->facets;
     }
 
     /**

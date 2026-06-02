@@ -33,6 +33,7 @@ class SearchController extends SController
         $query = Yii::$app->request->get('q');
         $collections = Yii::$app->request->get('collection');
         $mode = Yii::$app->request->get('mode');
+        $gradeNorm = Yii::$app->request->get('gradeNorm');
         $query = trim($query);
         if ($query === '') {
             return $this->goHome();
@@ -43,10 +44,10 @@ class SearchController extends SController
 
         $page = Yii::$app->request->get('page', 1);
         $page = intval($page);
-        return $this->processSearch($query, $page, $collections, $mode);
+        return $this->processSearch($query, $page, $collections, $mode, $gradeNorm);
     }
 
-    public function processSearch($query, $page, $collections, $mode = null)
+    public function processSearch($query, $page, $collections, $mode = null, $gradeNorm = null)
     {
         $this->pathCrumbs('Search Results', '');
 
@@ -56,6 +57,7 @@ class SearchController extends SController
         $searchEngine->setLimitPage($limit, $page);
         $searchEngine->setCollections($collections);
         $searchEngine->setMode($mode);
+        $searchEngine->setGradeNorm($gradeNorm);
 		set_error_handler(function ($err_severity, $err_msg, $err_file, $err_line)
 							{ throw new \ErrorException($err_msg, 0, $err_severity, $err_file, $err_line); }, E_WARNING);
 		try {
@@ -95,6 +97,8 @@ class SearchController extends SController
             'pageNumber' => $page,
             'resultsPerPage' => $limit,
             'pagination' => $pagination,
+            'facets' => $resultset->getFacets(),
+            'activeGradeNorm' => is_array($gradeNorm) ? $gradeNorm : ($gradeNorm ? [$gradeNorm] : []),
         );
 
         $this->pathCrumbs('Search Results - '.helpers\Html::encode($query).' (page '.$page.')', '');
