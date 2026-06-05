@@ -2,6 +2,12 @@
 <div class=content>
 <br>
 <p align=center style="font-size: 16px;"><b>View our more detailed <a href="/changelog">changelog</a>.</b></p>
+May 2026: Added <a href="/ibnkhuzayma">Sahih ibn Khuzayma</a>, <a href="/ibnhibban">Sahih ibn Hibban</a>, <a href="/hakim">Mustadrak al-Hakim</a>, <a href="/ibnabishayba">Musannaf ibn Abi Shayba</a>, <a href="/abdurrazzaq">Musannaf Abd ar-Razzaq</a>, <a href="/daraqutni">Sunan ad-Daraqutni</a>, <a href="/bayhaqi">Sunan al-Bayhaqi</a>, and <a href="/nasaikubra">Sunan an-Nasa'i al-Kubra</a>.<br>
+<br>
+April 2026: Added information for almost 50,000 narrators.<br>
+<br>
+March 2025: Added a new collection: <a href="/virtues">Special Virtues of the Qur'an's Chapters and Verses</a>.<br>
+<br>
 February 2024: Upgraded search. You can now search by collection and hadith number. For results only from Sahih al-Bukhari for example, add "collection:bukhari" to your query.<br>
 <br>
 January 2024: Completed adding the Bangla translation for <a href="/bukhari">Sahih al-Bukhari</a>. Sahih Muslim is next in sha Allah.<br>
