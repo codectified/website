@@ -46,9 +46,23 @@ class ArabicHadith extends Hadith
     }
 
     public function narratorHandler(ShortcodeInterface $s) {
-        return sprintf('<a href="/narrator/%s" title="%s" rel="nofollow">%s</a>',
-            $s->getParameter("id"),
-            addslashes($s->getParameter("tooltip")),
+        $id = $s->getParameter("id");
+        $tooltip = $s->getParameter("tooltip");
+        $title = "";
+
+        if (!is_null($tooltip) && trim((string)$tooltip) !== "") {
+            $title = ' title="' . htmlspecialchars((string)$tooltip, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '"';
+        }
+
+        if (is_null($id) || trim((string)$id) === "") {
+            return sprintf('<span class="hadith_narrator_unlinked"%s>%s</span>',
+                $title,
+                $s->getContent());
+        }
+
+        return sprintf('<a href="/narrator/%s"%s rel="nofollow">%s</a>',
+            htmlspecialchars((string)$id, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'),
+            $title,
             $s->getContent());
     }
 
@@ -68,6 +82,14 @@ class ArabicHadith extends Hadith
         return preg_replace('/\[\/?[a-zA-Z][a-zA-Z0-9_-]*(?:\s+[^\]]*)?\s*\/?\]/u', '', $text);
     }
 
+    private function ensureHadithSectionSpacing($text) {
+        return preg_replace(
+            '/(\[\/(?:prematn|matn|postmatn)\])(?=\[(?:prematn|matn|postmatn)(?:\s|\]))/u',
+            '$1 ',
+            $text
+        );
+    }
+
     private function makeShortcodeParser() {
         $this->facade = new ShortcodeFacade();
         $this->facade->addHandler('prematn', array($this, 'sanadizer'));
@@ -85,6 +107,7 @@ class ArabicHadith extends Hadith
 
         if (strpos($processed_text, "]")) {
             $this->makeShortcodeParser();
+            $processed_text = $this->ensureHadithSectionSpacing($processed_text);
             $processed_text = $this->facade->process($processed_text);
             $processed_text = $this->stripUnhandledShortcodes($processed_text);
             $this->shortcode_parsed = true;

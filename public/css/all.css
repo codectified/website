@@ -1360,6 +1360,16 @@ input.searchquery{
     color:var(--sanad_text_color)
 }
 
+.hadith_narrator_unlinked {
+    color: #6f9090;
+    color: color-mix(in srgb, var(--link-color) 45%, var(--sanad_text_color));
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: currentColor;
+    text-underline-offset: 0.18em;
+    cursor: default;
+}
+
 .arabic_text_details {
      text-align:justify;
      direction:rtl;
