@@ -77,10 +77,9 @@ abstract class SearchEngine
             try {
                 $searchdb = Yii::$app->searchdb;
                 $searchdb->createCommand(
-                    'INSERT INTO `search_queries` (query, IP, numResults) VALUES (:query, :IP, :numResults)',
+                    'INSERT INTO `search_queries` (query, numResults) VALUES (:query, :numResults)',
                     [
                         ':query' => $this->query,
-                        ':IP' => Yii::$app->getRequest()->getUserIP(),
                         ':numResults' => $numResults
                     ]
                 )->execute();
