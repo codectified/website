@@ -44,18 +44,54 @@ if (isset($errorMsg)) {
     }
 
 
-    // ── Grade filter facets ──────────────────────────────────────────────────
+    // ── Search mode / model toggles ──────────────────────────────────────────
+    $currentMode  = $searchMode  ?? 'lexical';
+    $currentModel = $searchModel ?? null;
     $baseQ        = rawurlencode($searchQuery);
+
+    $models = [
+        'embeddinggemma-q8' => 'EmbeddingGemma',
+        'mxbai'             => 'mxbai-embed-large',
+        'mxbai-xsmall'      => 'mxbai-embed-xsmall',
+    ];
+    $effectiveModel = $currentModel ?: 'embeddinggemma-q8';
+
+    echo '<div style="margin:10px 0 14px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;">';
+    echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-right:4px;">Mode</span>';
+    foreach (['lexical' => 'Lexical', 'semantic' => 'Semantic'] as $modeKey => $modeLabel) {
+        $active = ($currentMode === $modeKey);
+        $href = $modeKey === 'lexical'
+            ? "/search?q={$baseQ}"
+            : "/search?q={$baseQ}&mode={$modeKey}&model={$effectiveModel}";
+        $style = $active ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;' : 'background:#fff;color:#555;';
+        echo "<a href=\"{$href}\" style=\"padding:4px 13px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">{$modeLabel}</a>";
+    }
+    if ($currentMode === 'semantic') {
+        echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-left:10px;margin-right:4px;">Model</span>';
+        foreach ($models as $modelKey => $modelLabel) {
+            $active = ($currentModel === $modelKey || (!$currentModel && $modelKey === 'embeddinggemma-q8'));
+            $href = "/search?q={$baseQ}&mode={$currentMode}&model={$modelKey}";
+            $style = $active ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;' : 'background:#fff;color:#555;';
+            echo "<a href=\"{$href}\" style=\"padding:4px 13px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">{$modelLabel}</a>";
+        }
+    }
+    echo '</div>';
+    // ─────────────────────────────────────────────────────────────────────────
+
+    // ── Grade filter facets ──────────────────────────────────────────────────
     $facets       = $facets ?? null;
     $activeGrades = $activeGradeNorm ?? [];
     if ($facets && isset($facets->gradeNorm->buckets) && count($facets->gradeNorm->buckets) > 0) {
+        $modeQS = ($currentMode && $currentMode !== 'lexical') ? "&mode={$currentMode}" : '';
+        if ($currentModel && $currentMode !== 'lexical') $modeQS .= '&model=' . rawurlencode($currentModel);
+
         echo '<div style="margin:0 0 12px;display:flex;flex-wrap:wrap;gap:5px;align-items:center;">';
         echo '<span style="font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-right:4px;">Grade</span>';
 
         // "All" pill — clears the grade filter
         $allActive = empty($activeGrades);
         $allStyle  = $allActive ? 'background:#75A1A1;color:#fff;border-color:#75A1A1;' : 'background:#fff;color:#555;';
-        echo "<a href=\"/search?q={$baseQ}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$allStyle}\">All</a>";
+        echo "<a href=\"/search?q={$baseQ}{$modeQS}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$allStyle}\">All</a>";
 
         $gradeOrder = ["Sahih", "Hasan", "Da'if", "Maudu'", "Uncategorized"];
         $bucketMap  = [];
@@ -75,7 +111,7 @@ if (isset($errorMsg)) {
             }
             $gradeQS = '';
             foreach ($newGrades as $g) $gradeQS .= '&gradeNorm=' . rawurlencode($g);
-            echo "<a href=\"/search?q={$baseQ}{$gradeQS}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">"
+            echo "<a href=\"/search?q={$baseQ}{$modeQS}{$gradeQS}\" style=\"padding:3px 12px;border-radius:20px;border:1.5px solid #ccc;font-size:12px;text-decoration:none;{$style}\">"
                 . htmlspecialchars($grade)
                 . " <span style=\"font-size:10px;opacity:.7;\">({$count})</span></a>";
         }

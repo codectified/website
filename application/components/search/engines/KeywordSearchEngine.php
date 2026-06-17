@@ -30,6 +30,7 @@ class KeywordSearchEngine extends SearchEngine
         $engine->setLimitPage($this->limit, $this->page);
         $engine->setCollections($this->collections);
         $engine->setMode($this->mode);
+        $engine->setModel($this->model);
         $engine->setGradeNorm($this->gradeNorm);
 
         $resultset = $engine->doSearch($this->query);

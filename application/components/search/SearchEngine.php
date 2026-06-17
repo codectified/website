@@ -24,6 +24,9 @@ abstract class SearchEngine
     /** @var string|null */
     protected $mode;
 
+    /** @var string|null */
+    protected $model;
+
     /** @var array[] */
     protected $gradeNorm = [];
 
@@ -46,6 +49,11 @@ abstract class SearchEngine
     public function setMode($mode)
     {
         $this->mode = $mode;
+    }
+
+    public function setModel($model)
+    {
+        $this->model = $model;
     }
 
     /**
